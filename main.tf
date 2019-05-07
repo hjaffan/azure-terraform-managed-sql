@@ -41,7 +41,7 @@ resource "azurerm_template_deployment" "test" {
       "metadata": {
         "description": "Location for all resources."
       }
-    }
+    },
   },
   "variables": {
     "sqlServerName": "[concat('sqlserver', uniqueString(subscription().id, resourceGroup().id))]",
