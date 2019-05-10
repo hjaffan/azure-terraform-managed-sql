@@ -1,6 +1,6 @@
 resource "azurerm_resource_group" "test" {
-  name     = "acctestRG-101"
-  location = "West US"
+  name     = "${var.resourceGroupName}"
+  location = "${var.resourceGroupLocation}"
 }
 
 resource "azurerm_template_deployment" "test" {
@@ -59,6 +59,12 @@ resource "azurerm_template_deployment" "test" {
         "metadata": {
           "description": "Database Collation Setting."
         }
+      },
+      "databaseServiceObjectiveName": {
+        "type": "string",
+        "metadata": {
+          "description": "Database Service Objective Name."
+        }
       }
     },
     "variables": {
@@ -91,7 +97,7 @@ resource "azurerm_template_deployment" "test" {
             "properties": {
               "edition": "[parameters('databaseEdition')]",
               "collation": "[parameters('databaseCollation')]",
-              "requestedServiceObjectiveName": "[variables('databaseServiceObjectiveName')]"
+              "requestedServiceObjectiveName": "[parameters('databaseServiceObjectiveName')]"
             },
             "dependsOn": [
               "[variables('sqlServerName')]"

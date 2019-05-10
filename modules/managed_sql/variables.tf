@@ -1,18 +1,3 @@
-variable "sqlAdministratorLogin" {
-    type = "string"
-    default = "GEN-UNIQUE"
-}
-
-variable "sqlAdministratorLoginPassword" {
-    type = "string"
-    default = "SDfasdflkj@!"
-}
-
-variable "transparentDataEncryption" {
-    type = "string"
-    default = "Disabled"
-}
-
 variable "resourceGroupName" {
     type = "string" 
 }
@@ -20,13 +5,26 @@ variable "resourceGroupName" {
 variable "resourceGroupLocation" {
     type = "string"
 }
+variable "sqlAdministratorLogin" {
+    type = "string"
+    default = "terraform-user"
+}
 
 variable "databaseName" {
     type = "string"
 }
+variable "sqlAdministratorLoginPassword" {
+    type = "string"
+}
+
+variable "transparentDataEncryption" {
+    type = "string"
+    default = "Disabled"
+}
 
 variable "databaseEdition" {
     type = "string"
+    default = ""
 }
 
 variable "databaseCollation" {
@@ -36,5 +34,5 @@ variable "databaseCollation" {
 
 variable "databaseServiceObjectiveName" {
     type = "string"
-    default = ""
+    default = "Basic"
 }
