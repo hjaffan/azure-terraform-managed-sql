@@ -4,35 +4,35 @@ variable "sqlAdministratorLogin" {
 }
 
 variable "sqlAdministratorLoginPassword" {
-    type = "string"
-    default = "GEN-PASSWORD"
+    type = "securestring"
+    default = "SDfasdflkj@!"
 }
 
 variable "transparentDataEncryption" {
     type = "string"
-    default = "false"
+    default = "Disabled"
 }
 
-variable "resourceGroupName" {
-    type = "string" 
-}
+# variable "resourceGroupName" {
+#     type = "string" 
+# }
 
-variable "resourceGroupLocation" {
-    type = "string"
-}
+# variable "resourceGroupLocation" {
+#     type = "string"
+# }
 
 variable "databaseName" {
     type = "string"
 }
 
-variable "databaseEdition" {
-    type = "string"
-}
+# variable "databaseEdition" {
+#     type = "string"
+# }
 
-variable "databaseCollation" {
-    type = "string"
-}
+# variable "databaseCollation" {
+#     type = "string"
+# }
 
-variable "databaseServiceObjectiveName" {
-    type = "string"
-}
+# variable "databaseServiceObjectiveName" {
+#     type = "string"
+# }
