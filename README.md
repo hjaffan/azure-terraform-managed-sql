@@ -16,6 +16,7 @@ This is achived using the azure deployment via azure templates.
 |databaseEdition|String|Basic|
 |databaseCollation|String|SQL_Latin1_General_CP1_CI_AS|
 |databaseServiceObjectiveName|String|Basic|
+|databaseResourceName|String|managed_sql_deployment|
 
 # Usage
 
@@ -41,6 +42,7 @@ provider "azurerm" {
   version = "=1.24.0"
 }
 ```
+
 ```bash
 terraform init # Run this to import the module
 ```

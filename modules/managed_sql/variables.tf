@@ -36,3 +36,8 @@ variable "databaseServiceObjectiveName" {
     type = "string"
     default = "Basic"
 }
+
+variable "databaseResourceName" {
+  type = "string"
+  default = "managed_sql_deployment"
+}

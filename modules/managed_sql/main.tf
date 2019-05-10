@@ -1,11 +1,11 @@
-resource "azurerm_resource_group" "test" {
+resource "azurerm_resource_group" "default" {
   name     = "${var.resourceGroupName}"
   location = "${var.resourceGroupLocation}"
 }
 
-resource "azurerm_template_deployment" "test" {
-  name                = "acctesttemplate-101"
-  resource_group_name = "${azurerm_resource_group.test.name}"
+resource "azurerm_template_deployment" "default" {
+  name                = "${var.databaseResourceName}"
+  resource_group_name = "${azurerm_resource_group.default.name}"
 
   template_body = <<DEPLOY
   {
