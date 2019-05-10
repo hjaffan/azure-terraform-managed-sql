@@ -4,5 +4,5 @@ module "manage_mssql" {
   resourceGroupName = "acctestRG-101"
   sqlAdministratorLogin = "sys_adminuser"
   sqlAdministratorLoginPassword = "SuperSece@ret123"
-  resourceGroupLocation = "US WEST"
+  resourceGroupLocation = "West US"
 }

@@ -154,6 +154,7 @@ resource "azurerm_template_deployment" "test" {
     "transparentDataEncryption" = "${var.transparentDataEncryption}"
     "databaseEdition" = "${var.databaseEdition}"
     "databaseCollation" = "${var.databaseCollation}"
+    "databaseServiceObjectiveName" = "${var.databaseServiceObjectiveName}"
   }
 
   deployment_mode = "Incremental"
