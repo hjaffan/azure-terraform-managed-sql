@@ -4,7 +4,7 @@ variable "sqlAdministratorLogin" {
 }
 
 variable "sqlAdministratorLoginPassword" {
-    type = "securestring"
+    type = "string"
     default = "SDfasdflkj@!"
 }
 
