@@ -1,3 +1,3 @@
-resource "managed-sql" "azure-sql" {
+resource "managed_sql" "azure-sql" {
   
 }
