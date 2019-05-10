@@ -5,16 +5,16 @@ variable "resourceGroupName" {
 variable "resourceGroupLocation" {
     type = "string"
 }
-variable "sqlAdministratorLogin" {
-    type = "string"
-    default = "terraform-user"
-}
 
 variable "databaseName" {
     type = "string"
 }
 variable "sqlAdministratorLoginPassword" {
     type = "string"
+}
+variable "sqlAdministratorLogin" {
+    type = "string"
+    default = "terraform-user"
 }
 
 variable "transparentDataEncryption" {
@@ -24,7 +24,7 @@ variable "transparentDataEncryption" {
 
 variable "databaseEdition" {
     type = "string"
-    default = ""
+    default = "Basic"
 }
 
 variable "databaseCollation" {
