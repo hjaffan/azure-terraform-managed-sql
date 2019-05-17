@@ -1,6 +1,6 @@
 resource "azurerm_resource_group" "default" {
-  name     = "${var.resourceGroupName}"
-  location = "${var.resourceGroupLocation}"
+  name     = "myTestRG"
+  location = "West US"
 }
 module "manage_mssql" {
   source = "./modules/managed_sql"

@@ -25,6 +25,7 @@ variable "administratorLoginPassword" {
 }
 variable "location" {
   type = "string"
+  default = ""
   description = "Enter location. If you leave this field blank resource group location would be used."
 }
 
@@ -59,13 +60,13 @@ variable "skuName" {
 }
 
 variable "vCores" {
-    type = "int"
-    default = 8
+    type = "string"
+    default = "8"
     description = "Enter number of vCores."
 }
 variable "storageSizeInGB" {
-  type = "int"
-  default = 32
+  type = "string"
+  default = "32"
   description = "Enter storage size."
 }
 
