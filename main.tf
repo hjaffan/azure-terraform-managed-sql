@@ -8,4 +8,7 @@ module "manage_mssql" {
   administratorLogin = ""
   administratorLoginPassword = ""
   azurerm_resource_group_name = "${azurerm_resource_group.default.name}"
+  location = "${azurerm_resource_group.default.location}"
+  licenseType = "BasePrice"
+  skuName = "GP_Gen5"
 }
