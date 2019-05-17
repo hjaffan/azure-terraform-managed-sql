@@ -74,26 +74,24 @@ resource "azurerm_template_deployment" "default" {
             }
         },
         "vCores": {
-            "type": "int",
-            "defaultValue": 8,
+            "type": "string",
+            "defaultValue": "8",
             "allowedValues":[
-                8,
-                16,
-                24,
-                32,
-                40,
-                64,
-                80
+                "8",
+                "16",
+                "24",
+                "32",
+                "40",
+                "64",
+                "80"
             ],              
             "metadata": {
                 "description": "Enter number of vCores."
             }
         },
         "storageSizeInGB": {
-            "type": "int",         
-            "defaultValue": 256,
-            "minValue": 32,
-            "maxValue": 8192,
+            "type": "string",         
+            "defaultValue": "256",
             "metadata": {
                 "description": "Enter storage size."
             }
@@ -304,13 +302,13 @@ resource "azurerm_template_deployment" "default" {
                 "administratorLogin": "[parameters('administratorLogin')]",
                 "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
                 "subnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-                "storageSizeInGB": "[parameters('storageSizeInGB')]",
-                "vCores": "[parameters('vCores')]",
+                "storageSizeInGB": "[int(parameters('storageSizeInGB'))]",
+                "vCores": "[int(parameters('vCores'))]",
                 "licenseType": "[parameters('licenseType')]"
             }
         }
     ]
-}
+  }
   DEPLOY
 
   # these key-value pairs are passed into the ARM Template's `parameters` block
