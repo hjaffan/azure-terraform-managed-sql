@@ -320,13 +320,18 @@ resource "azurerm_template_deployment" "default" {
 
   # these key-value pairs are passed into the ARM Template's `parameters` block
   parameters = {
-    "databaseName" = "${var.databaseName}"
-    "sqlAdministratorLogin" = "${var.sqlAdministratorLogin}"
-    "sqlAdministratorLoginPassword" = "${var.sqlAdministratorLoginPassword}"
-    "transparentDataEncryption" = "${var.transparentDataEncryption}"
-    "databaseEdition" = "${var.databaseEdition}"
-    "databaseCollation" = "${var.databaseCollation}"
-    "databaseServiceObjectiveName" = "${var.databaseServiceObjectiveName}"
+    managedInstanceName = "${var.managedInstanceName}"
+    administratorLogin = "${var.administratorLogin}"
+    administratorLoginPassword = "${var.administratorLoginPassword}"
+    location = "${var.location}"
+    virtualNetworkName = "${var.virtualNetworkName}"
+    addressPrefix = "${var.addressPrefix}"
+    subnetName = "${var.subnetName}"
+    subnetPrefix = "${var.subnetPrefix}"
+    skuName = "${var.skuName}"
+    vCores = "${var.vCores}"
+    storageSizeInGB = "${var.storageSizeInGB}"
+    licenseType = "${var.licenseType}"
   }
 
   deployment_mode = "Incremental"
