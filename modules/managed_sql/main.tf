@@ -10,140 +10,312 @@ resource "azurerm_template_deployment" "default" {
   template_body = <<DEPLOY
   {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
+    "contentVersion": "1.0.0.1",
     "parameters": {
-      "sqlAdministratorLogin": {
-        "type": "string",
-        "metadata": {
-          "description": "The administrator username of the SQL Server."
+        "managedInstanceName": {
+            "type": "string",
+            "metadata": {
+                "description": "Enter managed instance name."
+            }
+        },
+        "administratorLogin": {
+            "type": "string",
+            "metadata": {
+                "description": "Enter user name."
+            }
+        },
+        "administratorLoginPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Enter password."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Enter location. If you leave this field blank resource group location would be used."
+            }
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "defaultValue": "SQLMI-VNET",
+            "metadata": {
+                "description": "Enter virtual network name. If you leave this field blank name will be created by the template."
+            }
+        },
+        "addressPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+                "description": "Enter virtual network address prefix."
+            }
+        },
+        "subnetName": {
+            "type": "string",
+            "defaultValue": "ManagedInstance",
+            "metadata": {
+                "description": "Enter subnet name."
+            }
+        },
+        "subnetPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/24",
+            "metadata": {
+                "description": "Enter subnet address prefix."
+            }
+        },
+        "skuName": {
+            "type": "string",
+            "allowedValues":[
+                "GP_Gen4",
+                "GP_Gen5",
+                "BC_Gen4",
+                "BC_Gen5"
+            ],
+            "defaultValue": "GP_Gen4",
+            "metadata": {
+                "description": "Enter sku name."
+            }
+        },
+        "vCores": {
+            "type": "int",
+            "defaultValue": 8,
+            "allowedValues":[
+                8,
+                16,
+                24,
+                32,
+                40,
+                64,
+                80
+            ],              
+            "metadata": {
+                "description": "Enter number of vCores."
+            }
+        },
+        "storageSizeInGB": {
+            "type": "int",         
+            "defaultValue": 256,
+            "minValue": 32,
+            "maxValue": 8192,
+            "metadata": {
+                "description": "Enter storage size."
+            }
+        },
+        "licenseType": {
+            "type": "string",
+            "defaultValue": "LicenseIncluded",
+            "allowedValues":[
+                "BasePrice",
+                "LicenseIncluded"
+            ],             
+            "metadata": {
+                "description": "Enter license type."
+            }
         }
-      },
-      "sqlAdministratorLoginPassword": {
-        "type": "securestring",
-        "metadata": {
-          "description": "The administrator password of the SQL Server."
-        }
-      },
-      "transparentDataEncryption": {
-        "type": "string",
-        "allowedValues": [
-          "Enabled",
-          "Disabled"
-        ],
-        "defaultValue": "Enabled",
-        "metadata": {
-          "description": "Enable or disable Transparent Data Encryption (TDE) for the database."
-        }
-      },
-      "databaseName": {
-        "type": "string",
-        "metadata": {
-          "description": "The name of the database."
-        }
-      },
-      "location": {
-        "type": "string",
-        "defaultValue": "[resourceGroup().location]",
-        "metadata": {
-          "description": "Location for all resources."
-        }
-      },
-      "databaseEdition": {
-        "type": "string",
-        "metadata": {
-          "description": "Database Edition."
-        }
-      },
-      "databaseCollation": {
-        "type": "string",
-        "metadata": {
-          "description": "Database Collation Setting."
-        }
-      },
-      "databaseServiceObjectiveName": {
-        "type": "string",
-        "metadata": {
-          "description": "Database Service Objective Name."
-        }
-      }
     },
     "variables": {
-      "sqlServerName": "[concat('sqlserver', uniqueString(subscription().id, resourceGroup().id))]",
-      "databaseServiceObjectiveName": "Basic"
+        "networkSecurityGroupName": "[concat('SQLMI-', parameters('managedInstanceName'), '-NSG')]",
+        "routeTableName": "[concat('SQLMI-', parameters('managedInstanceName'), '-Route-Table')]"
     },
     "resources": [
-      {
-        "name": "[variables('sqlServerName')]",
-        "type": "Microsoft.Sql/servers",
-        "apiVersion": "2014-04-01-preview",
-        "location": "[parameters('location')]",
-        "tags": {
-          "displayName": "SqlServer"
-        },
-        "properties": {
-          "administratorLogin": "[parameters('sqlAdministratorLogin')]",
-          "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
-          "version": "12.0"
-        },
-        "resources": [
-          {
-            "name": "[parameters('databaseName')]",
-            "type": "databases",
-            "apiVersion": "2015-01-01",
+        {
+            "apiVersion": "2017-10-01",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('networkSecurityGroupName')]",
             "location": "[parameters('location')]",
-            "tags": {
-              "displayName": "Database"
-            },
             "properties": {
-              "edition": "[parameters('databaseEdition')]",
-              "collation": "[parameters('databaseCollation')]",
-              "requestedServiceObjectiveName": "[parameters('databaseServiceObjectiveName')]"
-            },
-            "dependsOn": [
-              "[variables('sqlServerName')]"
-            ],
-            "resources": [
-              {
-                "comments": "Transparent Data Encryption",
-                "name": "current",
-                "type": "transparentDataEncryption",
-                "apiVersion": "2014-04-01-preview",
-                "properties": {
-                  "status": "[parameters('transparentDataEncryption')]"
+              "securityRules": [
+                {
+                  "name": "allow_management_inbound",
+                  "properties": {
+                    "description": "Allow inbound management traffic",
+                    "protocol": "Tcp",
+                    "sourcePortRange": "*",
+                    "destinationPortRanges": ["9000", "9003", "1438", "1440", "1452"],
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "*",
+                    "access": "Allow",
+                    "priority": 100,
+                    "direction": "Inbound"
+                  }
                 },
-                "dependsOn": [
-                  "[parameters('databaseName')]"
-                ]
-              }
-            ]
-          },
-          {
-            "name": "AllowAllMicrosoftAzureIps",
-            "type": "firewallrules",
-            "apiVersion": "2014-04-01",
+                {
+                    "name": "allow_misubnet_inbound",
+                    "properties": {
+                      "description": "Allow inbound traffic inside the subnet",
+                      "protocol": "*",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "*",
+                      "sourceAddressPrefix": "[parameters('subnetPrefix')]",
+                      "destinationAddressPrefix": "*",
+                      "access": "Allow",
+                      "priority": 200,
+                      "direction": "Inbound"
+                    }
+                  },
+                  {
+                    "name": "allow_health_probe_inbound",
+                    "properties": {
+                      "description": "Allow health probe",
+                      "protocol": "*",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "*",
+                      "sourceAddressPrefix": "AzureLoadBalancer",
+                      "destinationAddressPrefix": "*",
+                      "access": "Allow",
+                      "priority": 300,
+                      "direction": "Inbound"
+                    }
+                  },
+                  {
+                    "name": "allow_tds_inbound",
+                    "properties": {
+                      "description": "Allow access to data",
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "1433",
+                      "sourceAddressPrefix": "VirtualNetwork",
+                      "destinationAddressPrefix": "*",
+                      "access": "Allow",
+                      "priority": 1000,
+                      "direction": "Inbound"
+                    }
+                  },
+                  {
+                    "name": "deny_all_inbound",
+                    "properties": {
+                      "description": "Deny all other inbound traffic",
+                      "protocol": "*",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "*",
+                      "sourceAddressPrefix": "*",
+                      "destinationAddressPrefix": "*",
+                      "access": "Deny",
+                      "priority": 4096,
+                      "direction": "Inbound"
+                    }
+                  },
+                  {
+                    "name": "allow_management_outbound",
+                    "properties": {
+                      "description": "Allow outbound management traffic",
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRanges": ["80", "443", "12000"],
+                      "sourceAddressPrefix": "*",
+                      "destinationAddressPrefix": "*",
+                      "access": "Allow",
+                      "priority": 100,
+                      "direction": "Outbound"
+                    }
+                  },
+                  {
+                    "name": "allow_misubnet_outbound",
+                    "properties": {
+                      "description": "Allow outbound traffic inside the subnet",
+                      "protocol": "*",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "*",
+                      "sourceAddressPrefix": "*",
+                      "destinationAddressPrefix": "[parameters('subnetPrefix')]",
+                      "access": "Allow",
+                      "priority": 200,
+                      "direction": "Outbound"
+                    }
+                  },                  
+                  {
+                    "name": "deny_all_outbound",
+                    "properties": {
+                      "description": "Deny all other outbound traffic",
+                      "protocol": "*",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "*",
+                      "sourceAddressPrefix": "*",
+                      "destinationAddressPrefix": "*",
+                      "access": "Deny",
+                      "priority": 4096,
+                      "direction": "Outbound"
+                    }
+                  }
+              ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "name": "[variables('routeTableName')]",
+            "apiVersion": "2018-02-01",
             "location": "[parameters('location')]",
             "properties": {
-              "endIpAddress": "0.0.0.0",
-              "startIpAddress": "0.0.0.0"
+                "disableBgpRoutePropagation": false,
+                "routes": [
+                    {
+                        "name": "default",
+                        "properties": {
+                            "addressPrefix": "0.0.0.0/0",
+                            "nextHopType": "Internet"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[parameters('virtualNetworkName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2018-02-01",
+            "dependsOn":[
+                "[variables('routeTableName')]",
+                "[variables('networkSecurityGroupName')]"
+            ],
+            "location": "[parameters('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnetPrefix')]",
+                            "routeTable": {
+                                "id": "[resourceId('Microsoft.Network/routeTables', variables('routeTableName'))]"
+                            },
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                            }                            
+                        }
+                    }
+                ]
+            }
+        },      
+        {
+            "type": "Microsoft.Sql/managedInstances",
+            "apiVersion": "2015-05-01-preview",
+            "dependsOn":[
+                "[parameters('virtualNetworkName')]"
+            ],
+            "identity": {
+                "type": "SystemAssigned"
             },
-            "dependsOn": [
-              "[variables('sqlServerName')]"
-            ]
-          }
-        ]
-      }
-    ],
-    "outputs": {
-      "sqlServerFqdn": {
-        "type": "string",
-        "value": "[reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName]"
-      },
-      "databaseName": {
-        "type": "string",
-        "value": "[parameters('databaseName')]"
-      }
-    }
-  }
+            "location": "[parameters('location')]",
+            "name": "[parameters('managedInstanceName')]",
+            "sku": {
+                "name": "[parameters('skuName')]"
+            },
+            "properties": {
+                "administratorLogin": "[parameters('administratorLogin')]",
+                "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
+                "subnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
+                "storageSizeInGB": "[parameters('storageSizeInGB')]",
+                "vCores": "[parameters('vCores')]",
+                "licenseType": "[parameters('licenseType')]"
+            }
+        }
+    ]
+}
   DEPLOY
 
   # these key-value pairs are passed into the ARM Template's `parameters` block
