@@ -17,10 +17,10 @@ This is achived using the azure deployment via azure templates.
 |addressPrefix|string|10.0.0.0/16|Enter virtual network address prefix.|
 |subnetName|string|ManagedInstance|Enter subnet name.|
 |subnetPrefix|string|10.0.0.0/24|Enter subnet address prefix.|
-|skuName|string|GP_Gen4|Enter sku name.|
-|vCores|int|8|Enter number of vCores.|
-|storageSizeInGB|ing|32|Enter storage size.|
-|licenseType|string|LicenseIncluded|Enter license type.|
+|skuName|string|GP_Gen4|Enter sku name.(GP_Gen4,GP_Gen5,BC_Gen4,BC_Gen5)|
+|vCores|int|8|Enter number of vCores.(8,16,24,32,40,64,80)|
+|storageSizeInGB|ing|32|Enter storage size.(min 32 max 8192)|
+|licenseType|string|LicenseIncluded|Enter license type. (BasePrice, LicenseIncluded)|
 
 # Usage
 
