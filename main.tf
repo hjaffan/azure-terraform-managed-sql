@@ -1,8 +1,11 @@
+resource "azurerm_resource_group" "default" {
+  name     = "${var.resourceGroupName}"
+  location = "${var.resourceGroupLocation}"
+}
 module "manage_mssql" {
   source = "./modules/managed_sql"
-  databaseName = "my_defaultDb"
-  resourceGroupName = "acctestRG-101"
-  sqlAdministratorLogin = "sys_adminuser"
-  sqlAdministratorLoginPassword = "SuperSece@ret123"
-  resourceGroupLocation = "West US"
+  managedInstanceName = ""
+  administratorLogin = ""
+  administratorLoginPassword = ""
+  azurerm_resource_group_name = "${azurerm_resource_group.default.name}"
 }

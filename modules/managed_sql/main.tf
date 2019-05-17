@@ -1,11 +1,6 @@
-resource "azurerm_resource_group" "default" {
-  name     = "${var.resourceGroupName}"
-  location = "${var.resourceGroupLocation}"
-}
-
 resource "azurerm_template_deployment" "default" {
   name                = "${var.databaseResourceName}"
-  resource_group_name = "${azurerm_resource_group.default.name}"
+  resource_group_name = "${var.azurerm_resource_group_name}"
 
   template_body = <<DEPLOY
   {
