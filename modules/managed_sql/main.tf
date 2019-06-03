@@ -32,32 +32,11 @@ resource "azurerm_template_deployment" "default" {
                 "description": "Enter location. If you leave this field blank resource group location would be used."
             }
         },
-        "virtualNetworkName": {
+        "subnetId": {
             "type": "string",
-            "defaultValue": "SQLMI-VNET",
+            "defaultValue": "",
             "metadata": {
-                "description": "Enter virtual network name. If you leave this field blank name will be created by the template."
-            }
-        },
-        "addressPrefix": {
-            "type": "string",
-            "defaultValue": "10.0.0.0/16",
-            "metadata": {
-                "description": "Enter virtual network address prefix."
-            }
-        },
-        "subnetName": {
-            "type": "string",
-            "defaultValue": "ManagedInstance",
-            "metadata": {
-                "description": "Enter subnet name."
-            }
-        },
-        "subnetPrefix": {
-            "type": "string",
-            "defaultValue": "10.0.0.0/24",
-            "metadata": {
-                "description": "Enter subnet address prefix."
+                "description": "Enter subnetId."
             }
         },
         "skuName": {
@@ -109,186 +88,12 @@ resource "azurerm_template_deployment" "default" {
         }
     },
     "variables": {
-        "networkSecurityGroupName": "[concat('SQLMI-', parameters('managedInstanceName'), '-NSG')]",
-        "routeTableName": "[concat('SQLMI-', parameters('managedInstanceName'), '-Route-Table')]"
     },
-    "resources": [
-        {
-            "apiVersion": "2017-10-01",
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "name": "[variables('networkSecurityGroupName')]",
-            "location": "[parameters('location')]",
-            "properties": {
-              "securityRules": [
-                {
-                  "name": "allow_management_inbound",
-                  "properties": {
-                    "description": "Allow inbound management traffic",
-                    "protocol": "Tcp",
-                    "sourcePortRange": "*",
-                    "destinationPortRanges": ["9000", "9003", "1438", "1440", "1452"],
-                    "sourceAddressPrefix": "*",
-                    "destinationAddressPrefix": "*",
-                    "access": "Allow",
-                    "priority": 100,
-                    "direction": "Inbound"
-                  }
-                },
-                {
-                    "name": "allow_misubnet_inbound",
-                    "properties": {
-                      "description": "Allow inbound traffic inside the subnet",
-                      "protocol": "*",
-                      "sourcePortRange": "*",
-                      "destinationPortRange": "*",
-                      "sourceAddressPrefix": "[parameters('subnetPrefix')]",
-                      "destinationAddressPrefix": "*",
-                      "access": "Allow",
-                      "priority": 200,
-                      "direction": "Inbound"
-                    }
-                  },
-                  {
-                    "name": "allow_health_probe_inbound",
-                    "properties": {
-                      "description": "Allow health probe",
-                      "protocol": "*",
-                      "sourcePortRange": "*",
-                      "destinationPortRange": "*",
-                      "sourceAddressPrefix": "AzureLoadBalancer",
-                      "destinationAddressPrefix": "*",
-                      "access": "Allow",
-                      "priority": 300,
-                      "direction": "Inbound"
-                    }
-                  },
-                  {
-                    "name": "allow_tds_inbound",
-                    "properties": {
-                      "description": "Allow access to data",
-                      "protocol": "Tcp",
-                      "sourcePortRange": "*",
-                      "destinationPortRange": "1433",
-                      "sourceAddressPrefix": "VirtualNetwork",
-                      "destinationAddressPrefix": "*",
-                      "access": "Allow",
-                      "priority": 1000,
-                      "direction": "Inbound"
-                    }
-                  },
-                  {
-                    "name": "deny_all_inbound",
-                    "properties": {
-                      "description": "Deny all other inbound traffic",
-                      "protocol": "*",
-                      "sourcePortRange": "*",
-                      "destinationPortRange": "*",
-                      "sourceAddressPrefix": "*",
-                      "destinationAddressPrefix": "*",
-                      "access": "Deny",
-                      "priority": 4096,
-                      "direction": "Inbound"
-                    }
-                  },
-                  {
-                    "name": "allow_management_outbound",
-                    "properties": {
-                      "description": "Allow outbound management traffic",
-                      "protocol": "Tcp",
-                      "sourcePortRange": "*",
-                      "destinationPortRanges": ["80", "443", "12000"],
-                      "sourceAddressPrefix": "*",
-                      "destinationAddressPrefix": "*",
-                      "access": "Allow",
-                      "priority": 100,
-                      "direction": "Outbound"
-                    }
-                  },
-                  {
-                    "name": "allow_misubnet_outbound",
-                    "properties": {
-                      "description": "Allow outbound traffic inside the subnet",
-                      "protocol": "*",
-                      "sourcePortRange": "*",
-                      "destinationPortRange": "*",
-                      "sourceAddressPrefix": "*",
-                      "destinationAddressPrefix": "[parameters('subnetPrefix')]",
-                      "access": "Allow",
-                      "priority": 200,
-                      "direction": "Outbound"
-                    }
-                  },                  
-                  {
-                    "name": "deny_all_outbound",
-                    "properties": {
-                      "description": "Deny all other outbound traffic",
-                      "protocol": "*",
-                      "sourcePortRange": "*",
-                      "destinationPortRange": "*",
-                      "sourceAddressPrefix": "*",
-                      "destinationAddressPrefix": "*",
-                      "access": "Deny",
-                      "priority": 4096,
-                      "direction": "Outbound"
-                    }
-                  }
-              ]
-            }
-        },
-        {
-            "type": "Microsoft.Network/routeTables",
-            "name": "[variables('routeTableName')]",
-            "apiVersion": "2018-02-01",
-            "location": "[parameters('location')]",
-            "properties": {
-                "disableBgpRoutePropagation": false,
-                "routes": [
-                    {
-                        "name": "default",
-                        "properties": {
-                            "addressPrefix": "0.0.0.0/0",
-                            "nextHopType": "Internet"
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "name": "[parameters('virtualNetworkName')]",
-            "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2018-02-01",
-            "dependsOn":[
-                "[variables('routeTableName')]",
-                "[variables('networkSecurityGroupName')]"
-            ],
-            "location": "[parameters('location')]",
-            "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "[parameters('addressPrefix')]"
-                    ]
-                },
-                "subnets": [
-                    {
-                        "name": "[parameters('subnetName')]",
-                        "properties": {
-                            "addressPrefix": "[parameters('subnetPrefix')]",
-                            "routeTable": {
-                                "id": "[resourceId('Microsoft.Network/routeTables', variables('routeTableName'))]"
-                            },
-                            "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
-                            }                            
-                        }
-                    }
-                ]
-            }
-        },      
+    "resources": [    
         {
             "type": "Microsoft.Sql/managedInstances",
             "apiVersion": "2015-05-01-preview",
             "dependsOn":[
-                "[parameters('virtualNetworkName')]"
             ],
             "identity": {
                 "type": "SystemAssigned"
@@ -301,7 +106,7 @@ resource "azurerm_template_deployment" "default" {
             "properties": {
                 "administratorLogin": "[parameters('administratorLogin')]",
                 "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
-                "subnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
+                "subnetId": "[parameters('subnetId')]",
                 "storageSizeInGB": "[int(parameters('storageSizeInGB'))]",
                 "vCores": "[int(parameters('vCores'))]",
                 "licenseType": "[parameters('licenseType')]"
@@ -317,10 +122,7 @@ resource "azurerm_template_deployment" "default" {
     administratorLogin = "${var.administratorLogin}"
     administratorLoginPassword = "${var.administratorLoginPassword}"
     location = "${var.location}"
-    virtualNetworkName = "${var.virtualNetworkName}"
-    addressPrefix = "${var.addressPrefix}"
-    subnetName = "${var.subnetName}"
-    subnetPrefix = "${var.subnetPrefix}"
+    subnetId = "${var.subnetId}"
     skuName = "${var.skuName}"
     vCores = "${var.vCores}"
     storageSizeInGB = "${var.storageSizeInGB}"

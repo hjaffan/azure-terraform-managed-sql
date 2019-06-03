@@ -29,29 +29,14 @@ variable "location" {
   description = "Enter location. If you leave this field blank resource group location would be used."
 }
 
-variable "virtualNetworkName" {
-    type = "string"
-    default = "SQLMI-VNET"
-    description = "Enter virtual network name. If you leave this field blank name will be created by the template."    
-}
 
-variable "addressPrefix" {
-  type = "string"
-  default = "10.0.0.0/16"
-  description = "Enter virtual network address prefix."
-}
 
-variable "subnetName" {
+variable "subnetId" {
   type = "string"
-  default = "ManagedInstance"
+  default = ""
   description = "Enter subnet name."
 }
 
-variable "subnetPrefix" {
-  type = "string"
-  default = "10.0.0.0/24"
-  description = "Enter subnet address prefix."
-}
 
 variable "skuName" {
   type = "string"
