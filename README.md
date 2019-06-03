@@ -13,10 +13,7 @@ This is achived using the azure deployment via azure templates.
 |administratorLogin|string|None|Enter user name.|
 |administratorLoginPassword|string|None|Enter password.|
 |location|string|None|Enter location. If you leave this field blank resource group location would be used.|
-|virtualNetworkName|string|SQLMI-VNET|Enter virtual network name. If you leave this field blank name will be created by the template.|
-|addressPrefix|string|10.0.0.0/16|Enter virtual network address prefix.|
-|subnetName|string|ManagedInstance|Enter subnet name.|
-|subnetPrefix|string|10.0.0.0/24|Enter subnet address prefix.|
+|subnetId|string|""|Enter the sunetID of the network you'd like to link this resource to.|
 |skuName|string|GP_Gen4|Enter sku name.(GP_Gen4,GP_Gen5,BC_Gen4,BC_Gen5)|
 |vCores|int|8|Enter number of vCores.(8,16,24,32,40,64,80)|
 |storageSizeInGB|ing|32|Enter storage size.(min 32 max 8192)|
