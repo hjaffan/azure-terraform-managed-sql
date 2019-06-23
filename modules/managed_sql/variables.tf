@@ -1,12 +1,15 @@
-variable "azurerm_resource_group_name" {
+variable "azurermResourceGroupName" {
     type = "string"
+}
+
+variable "networkName" {
+  type = "string"
 }
 
 variable "databaseResourceName" {
   type = "string"
   default = "managed_sql_deployment"
 }
-
 
 // Managed Insance Variables
 variable "managedInstanceName" {
@@ -28,15 +31,6 @@ variable "location" {
   default = ""
   description = "Enter location. If you leave this field blank resource group location would be used."
 }
-
-
-
-variable "subnetId" {
-  type = "string"
-  default = ""
-  description = "Enter subnet name."
-}
-
 
 variable "skuName" {
   type = "string"
