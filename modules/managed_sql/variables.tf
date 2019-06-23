@@ -5,6 +5,9 @@ variable "azurermResourceGroupName" {
 variable "networkName" {
   type = "string"
 }
+variable "subnetName" {
+  type = "string"
+}
 
 variable "databaseResourceName" {
   type = "string"

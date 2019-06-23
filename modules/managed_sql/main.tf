@@ -1,6 +1,7 @@
-data "azurerm_virtual_network" "virtual_network" {
-  name                = "${var.networkName}"
-  resource_group_name = "${var.azurermResourceGroupName}"
+data "azurerm_subnet" "subnetNetwork" {
+  name                 = "${var.subnetName}"
+  virtual_network_name = "${var.networkName}"
+  resource_group_name  = "${var.azurermResourceGroupName}"
 }
 
 resource "azurerm_template_deployment" "default" {
@@ -127,7 +128,7 @@ resource "azurerm_template_deployment" "default" {
     administratorLogin = "${var.administratorLogin}"
     administratorLoginPassword = "${var.administratorLoginPassword}"
     location = "${var.location}"
-    subnetId = "${data.azurerm_virtual_network.virtual_network.id}"
+    subnetId = "${data.azurerm_subnet.subnetNetwork.id}"
     skuName = "${var.skuName}"
     vCores = "${var.vCores}"
     storageSizeInGB = "${var.storageSizeInGB}"
